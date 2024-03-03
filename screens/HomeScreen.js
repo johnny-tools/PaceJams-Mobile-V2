@@ -6,7 +6,9 @@ import {
   ScrollView,
   Image,
   Pressable,
+  TouchableOpacity
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { useEffect, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,7 +16,10 @@ import axios from 'axios';
 
 const HomeScreen = () => {
   const [userProfile, setUserProfile] = useState([]);
-  const [recommendedSongs,setRecommendedSongs] = useState([]);
+  const [recommendedSongs, setRecommendedSongs] = useState([]);
+  const [genre, setGenre] = useState('Rock');
+  const [minMile, setMinMile] = useState('5');
+
   const greetingMessage = () => {
     const currentTime = new Date().getHours();
     if (currentTime < 12) {
@@ -55,27 +60,33 @@ const HomeScreen = () => {
 
   const getRecommendedSongs = async () => {
     const accessToken = await AsyncStorage.getItem('token');
+    const userInfo = await AsyncStorage.getItem('userFormValues');
+    console.log('UserInfo>>>',userInfo);
     try {
       const response = await axios({
         method: 'GET',
         url: 'https://api.spotify.com/v1/recommendations?limit=100&market=US&seed_genres=rock',
         headers: {
           Authorization: `Bearer ${accessToken}`,
-        }
+        },
       });
       const tracks = response.data;
       setRecommendedSongs(tracks);
-
     } catch (err) {
       console.log(err.message);
     }
   };
 
-  useEffect(() => {
-    getRecommendedSongs();
-  },[])
+  // const getUserInfo = async () => {
+  //   const userInfo = await AsyncStorage.getItem('userFormValues');
+  //   console.log('UserInfo', userInfo);
+  // };
 
-  console.log("recommendedSongs", recommendedSongs);
+  // useEffect(() => {
+  //   getUserInfo();
+  // }, []);
+
+  console.log('recommendedSongs', recommendedSongs);
 
   return (
     <LinearGradient colors={['#040306', '#131624']} style={{ flex: 1 }}>
@@ -100,35 +111,44 @@ const HomeScreen = () => {
             </Text>
           </View>
         </View>
-        <View
-           style={{
-                 paddingTop:40,
-                }}
-                >
-          <Pressable>
-            <LinearGradient colors={['#33006F', '#FFFFFF']} style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-              <Pressable
-                style={{
-                  height: 55,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <Text
-                   style={{
-                    fontWeight: "bold",
-                    fontSize: 30,
-                    color: "white",
-                }}
-                >
-                Search Songs
-                </Text>
-              </Pressable>
-            </LinearGradient>
-          </Pressable>
+        <View style={styles.container}>
+          <Text style={styles.label}>Genre:</Text>
+          <Picker
+            selectedValue={genre}
+            style={styles.picker}
+            onValueChange={(itemValue) => setGenre(itemValue)}
+            itemStyle={styles.pickerItem}
+          >
+            <Picker.Item label='Rock' value='Rock' />
+            <Picker.Item label='Pop' value='Pop' />
+            <Picker.Item label='Alternative' value='Alternative' />
+            <Picker.Item label='Country' value='Country' />
+            <Picker.Item label='Rap' value='Rap' />
+          </Picker>
+
+          <Text style={styles.label}>Min/Mile:</Text>
+          <Picker
+            selectedValue={minMile}
+            style={styles.picker}
+            onValueChange={(itemValue) => setMinMile(itemValue)}
+            itemStyle={styles.pickerItem}
+          >
+            <Picker.Item label='5' value='5' />
+            <Picker.Item label='6' value='6' />
+            <Picker.Item label='7' value='7' />
+            <Picker.Item label='8' value='8' />
+            <Picker.Item label='9' value='9' />
+            <Picker.Item label='10' value='10' />
+            <Picker.Item label='11' value='11' />
+            <Picker.Item label='12' value='12' />
+            <Picker.Item label='13' value='13' />
+            <Picker.Item label='14' value='14' />
+            <Picker.Item label='15' value='15' />
+          </Picker>
+
+          <TouchableOpacity style={styles.button} onPress={getRecommendedSongs}>
+            <Text style={styles.buttonText}>Search Songs</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </LinearGradient>
@@ -137,4 +157,38 @@ const HomeScreen = () => {
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  label: {
+    fontSize: 18,
+    margin: 20,
+    color: 'white'
+  },
+  picker: {
+    backgroundColor: 'blue',
+    width: '70%',
+    borderRadius: 10,
+    // height: 40,
+    // marginBottom: 20,
+  },
+  pickerItem: {
+    borderRadius: 10,
+    color: 'white',
+    // height: 40,
+    // marginBottom: 20,
+  },
+  button: {
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 5,
+    margin: 20,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+});

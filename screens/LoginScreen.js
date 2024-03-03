@@ -6,6 +6,7 @@ import { AntDesign } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import {ResponseType, useAuthRequest} from 'expo-auth-session';
+import { UserInfo } from './UserInfo'
 // import { useSelector, useDispatch } from "react-redux";
 import axios from 'axios';
 
@@ -52,31 +53,37 @@ const LoginScreen = ({}) => {
   
       if (accessToken && expirationDate) {
         const currentTime = Date.now();
-        if (currentTime < parseInt(expirationDate, 10)) {
+        if (currentTime < parseInt(expirationDate)) {
           // here the token is still valid
-          navigation.replace("Main");
+          navigation.replace("UserInfo");
         } else {
-          // token has expired, clear the stored token data
-          await AsyncStorage.removeItem("token");
-          await AsyncStorage.removeItem("expirationDate");
+          // token has expired
+          AsyncStorage.removeItem("token");
+          AsyncStorage.removeItem("expirationDate");
         }
       }
     };
   
     checkTokenValidity();
   }, []);
+  
 
   useEffect(() => {
     if (response?.type === "success") {
-      const { access_token, expires_in } = response.params;
+      const { access_token } = response.params;
       setToken(access_token);
-      const expirationDate = new Date().getTime() + parseInt(expires_in) * 1000;
-      AsyncStorage.setItem("token", access_token);
-      AsyncStorage.setItem("expirationDate", expirationDate.toString());
-      navigation.navigate("Main");
     }
   }, [response]);
-  
+
+  useEffect(() => {
+    if (token) {
+      console.log(token);
+      const expirationDate = new Date(token.accessTokenExpirationDate).getTime();
+      AsyncStorage.setItem("token", token);
+      AsyncStorage.setItem("expirationDate", expirationDate.toString());
+      navigation.navigate("UserInfo")
+    }
+  });
 
   return (
     <LinearGradient colors={['#040306', '#131624']} style={{ flex: 1 }}>

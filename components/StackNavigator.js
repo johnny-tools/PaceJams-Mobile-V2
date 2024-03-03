@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import LoginScreen from '../screens/LoginScreen';
+import { UserInfo } from '../screens/UserInfo';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 
@@ -50,7 +51,7 @@ function BottomTabs() {
         name='Profile'
         component={ProfileScreen}
         options={{
-          tabBarLabel: 'Home',
+          tabBarLabel: 'Profile',
           headerShown: false,
           tabBarLabelStyle: { color: 'white' },
           tabBarIcon: ({ focused }) =>
@@ -73,6 +74,11 @@ function Navigation() {
         <Stack.Screen
           name='Login'
           component={LoginScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name='UserInfo'
+          component={UserInfo}
           options={{ headerShown: false }}
         />
         <Stack.Screen
